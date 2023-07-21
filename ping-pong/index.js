@@ -1,6 +1,9 @@
 const canvasEl = document.querySelector("canvas"),
   canvasCtx = canvasEl.getContext("2d"),
   gapX = 10;
+
+const mouse = { x: 0, y: 0 };
+
 const field = {
   w: window.innerWidth,
   h: window.innerHeight,
@@ -26,12 +29,17 @@ function setup() {
 
 const leftPaddle = {
   x: gapX,
-  y: 100,
+  y: 0,
   w: line.w,
   h: 200,
+  _move: function () {
+    this.y = mouse.y - (this.h / 2);
+  },
   draw: function () {
     canvasCtx.fillStyle = "#FFF";
     canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+
+    this._move();
   },
 };
 
@@ -40,9 +48,13 @@ const rigthPaddle = {
   y: 100,
   w: line.w,
   h: 200,
+  _move: function() {
+    this.y = ball.y
+  },
   draw: function () {
     canvasCtx.fillStyle = "#FFF";
     canvasCtx.fillRect(this.x, this.y, this.w, this.h);
+    this._move();
   },
 };
 
@@ -88,8 +100,28 @@ function draw() {
   score.draw();
   ball.draw();
 }
+window.animateFrame = (function () {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (callback) {
+      return window.setTimeout(callback, 1000 / 60);
+    }
+  );
+})();
+
+function main() {
+  animateFrame(main);
+  draw();
+}
 
 setup();
-draw();
+main();
 
-window.setInterval(draw, 1000 / 60);
+canvasEl.addEventListener("mousemove", function (e) {
+  mouse.x = e.pageX;
+  mouse.y = e.pageY;
+});
