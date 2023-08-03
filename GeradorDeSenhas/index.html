@@ -35,7 +35,6 @@
           <div
             id="security-indicator-bar"
             class="bar safe"
-            style="width: 90%"
           ></div>
         </div>
       </section>
@@ -100,6 +99,8 @@
       const upperCaseCheckEl = document.querySelector("#uppercase-check");
       const numbersCheckEl = document.querySelector("#numbers-check");
       const symbolCheckEl = document.querySelector("#symbol-check");
+      const securityIndicatorBarEl = document.querySelector("#security-indicator-bar");
+
       function generatePassword() {
         let chars = "abcdefghjkmnpqrstuvwxyz";
 
@@ -125,8 +126,38 @@
           password += chars.substring(randomNumber, randomNumber + 1);
         }
         inputEl.value = password;
+        calculateQuality();
       }
 
+      function calculateQuality(){
+
+        const percent = Math.round(
+            (passwordLenght / 64) * 25 +
+            (upperCaseCheckEl.checked ? 15 : 0) +
+            (numbersCheckEl.checked ? 25 : 0) +
+            (symbolCheckEl.checked ? 35 : 0)
+        )
+        securityIndicatorBarEl.style.width = `${percent}%`;
+        if(percent > 69){
+            securityIndicatorBarEl.classList.remove('critical')
+            securityIndicatorBarEl.classList.remove('warning')
+            securityIndicatorBarEl.classList.add('safe')
+        }else if(percent > 50){
+            securityIndicatorBarEl.classList.remove('critical')
+            securityIndicatorBarEl.classList.remove('safe')
+            securityIndicatorBarEl.classList.add('warning')
+        }else {
+            securityIndicatorBarEl.classList.remove('warning')
+            securityIndicatorBarEl.classList.remove('safe')
+            securityIndicatorBarEl.classList.add('critical')
+        }
+
+        if(percent >= 100){
+            securityIndicatorBarEl.classList.add("completed");
+        }else {
+            securityIndicatorBarEl.classList.remove("completed");
+        }
+      }
       function copy() {
         navigator.clipboard.writeText(inputEl.value);
       }
